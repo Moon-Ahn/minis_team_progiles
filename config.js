@@ -11,6 +11,6 @@
  * 자세한 순서는 README.md 를 보시면 됩니다.
  */
 window.EUM_CONFIG = {
-  supabaseUrl: '',
-  supabaseAnonKey: ''
+  supabaseUrl: 'https://ceyhpctssxrimvvqtoni.supabase.co',
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNleWhwY3Rzc3hyaW12dnF0b25pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzI5NTksImV4cCI6MjEwNTUwODk1OX0.gjwI6x1eViThocQEWPwnO_5xDZiQoZ7GoBz9IRnX6oc'
 };
