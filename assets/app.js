@@ -298,9 +298,7 @@ function renderSheet(){
   h.push('<div class="photos">' + photoCards(t.docs, 'docs') + '</div>');
   h.push('<button class="add-row" data-add="docs" style="margin-top:12px"><span class="plus">+</span> 자료 추가</button></div>');
 
-  h.push('<div class="sheet-foot"><span class="meter">작성률 ' + progress(t) + '%</span><span class="spacer"></span>');
-  if(state.teams.length > 1) h.push('<button class="btn tiny" data-delteam="1" style="color:var(--warn)">이 팀 삭제</button>');
-  h.push('</div></section>');
+  h.push('<div class="sheet-foot"><span class="meter">작성률 ' + progress(t) + '%</span></div></section>');
 
   var box = document.getElementById('sheets');
   box.innerHTML = h.join('');
@@ -367,7 +365,6 @@ app.addEventListener('click', function(e){
   if(b.dataset.del){ delItem(t, b.dataset.del, +b.dataset.i); return; }
   if(b.dataset.move){ moveItem(t, b.dataset.move, +b.dataset.i, +b.dataset.dir); return; }
   if(b.dataset.drop !== undefined){ pickPhoto(b.dataset.drop, +b.dataset.i); return; }
-  if(b.dataset.delteam){ delTeam(); return; }
 });
 
 app.addEventListener('keydown', function(e){
@@ -443,17 +440,6 @@ function addTeam(){
   sortTeams();            // 이름 순 제자리에 끼워 넣습니다
   renderAll();
   saveOrder();
-}
-function delTeam(){
-  var t = state.teams[state.active];
-  if(!confirm('「' + (t.name || '이 팀') + '」의 입력 내용을 모두 지울까요? 되돌릴 수 없습니다.')) return;
-  var id = t.id;
-  state.teams.splice(state.active, 1);
-  state.active = Math.max(0, state.active - 1);
-  renderAll();
-  Store.deleteTeam(id, state.teams)
-    .then(function(){ setStatus('삭제됨', 'saved'); })
-    .catch(function(e){ toast('삭제하지 못했습니다: ' + e.message); });
 }
 function clearSample(){
   var t = state.teams[state.active];

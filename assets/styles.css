@@ -308,7 +308,6 @@ input.team-name::placeholder{color:var(--ink-3);opacity:.55}
   margin-top:30px;padding-top:12px;border-top:1px solid var(--line-soft);
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;
 }
-.sheet-foot .spacer{flex:1}
 .meter{font-family:var(--mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
 
 .toast{

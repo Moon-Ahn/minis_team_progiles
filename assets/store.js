@@ -135,13 +135,6 @@ Store.saveOrder = async function(allTeams){
   allTeams.forEach(function(t){ Store.lastWrite[t.id] = at; });
 };
 
-Store.deleteTeam = async function(id, allTeams){
-  writeLocal({version:1, teams:allTeams, updated:Date.now()});
-  if(Store.mode !== 'cloud') return;
-  var res = await sb.from(TABLE).delete().eq('id', id);
-  if(res.error) throw new Error(res.error.message);
-};
-
 /* ---------- 이미지 ---------- */
 /* 로컬 모드는 data URI를, 클라우드 모드는 스토리지 공개 URL을 돌려줍니다. */
 Store.putImage = async function(blob, teamId, kind, index, ext){
