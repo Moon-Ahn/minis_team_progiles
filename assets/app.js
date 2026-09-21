@@ -112,6 +112,17 @@ function esc(s){
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 function has(v){ return !!(v && String(v).trim()); }
+/* 내용 비교용 표준형. Postgres 의 jsonb 는 키 순서를 제멋대로 바꿔서
+   돌려주므로, 키를 정렬해 놓고 비교해야 «같은 내용»인지 알 수 있습니다. */
+function canon(v){
+  if(Array.isArray(v)) return '[' + v.map(canon).join(',') + ']';
+  if(v && typeof v === 'object'){
+    return '{' + Object.keys(v).sort().map(function(k){
+      return JSON.stringify(k) + ':' + canon(v[k]);
+    }).join(',') + '}';
+  }
+  return JSON.stringify(v === undefined ? null : v);
+}
 function isDark(){
   var t = document.documentElement.getAttribute('data-theme');
   if(t === 'dark') return true;
@@ -695,8 +706,12 @@ if(window.matchMedia){
         if(at >= 0 && at !== state.active){ state.teams.splice(at, 1); renderAll(); }
         return;
       }
-      // 내가 방금 저장한 내용이 되돌아온 것이면 조용히 넘어갑니다.
-      if(at >= 0 && JSON.stringify(row.data) === JSON.stringify(state.teams[at])) return;
+      // 내가 마지막으로 보낸 것보다 오래된 소식이면 무시합니다.
+      // (방금 친 글자가 직전 저장분 메아리에 되돌려지는 것을 막습니다)
+      var when = row.updated_at || '';
+      if(when && Store.lastWrite[row.id] && when <= Store.lastWrite[row.id]) return;
+      // 내용이 지금과 같으면 (= 내 저장이 그대로 돌아온 것이면) 볼 것이 없습니다.
+      if(at >= 0 && canon(row.data) === canon(state.teams[at])) return;
       if(at < 0){
         state.teams.push(normalize(Object.assign({}, row.data, {id:row.id})));
         renderRail();

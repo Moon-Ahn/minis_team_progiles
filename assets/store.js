@@ -23,7 +23,8 @@ var listeners = [];
 var Store = {
   mode: 'local',      // 'local' | 'cloud'
   error: null,
-  configured: configured
+  configured: configured,
+  lastWrite: {}       // 팀별로 «내가» 마지막에 보낸 시각. 메아리를 걸러내는 데 씁니다.
 };
 
 /* ---------- 공통 ---------- */
@@ -111,23 +112,27 @@ Store.saveTeam = async function(team, order, allTeams){
     if(!okLocal) throw new Error('브라우저 저장 공간이 가득 찼습니다.');
     return;
   }
+  var at = new Date().toISOString();
   var res = await sb.from(TABLE).upsert({
     id: team.id,
     sort_order: order,
     data: team,
-    updated_at: new Date().toISOString()
+    updated_at: at
   });
   if(res.error) throw new Error(res.error.message);
+  Store.lastWrite[team.id] = at;
 };
 
 Store.saveOrder = async function(allTeams){
   writeLocal({version:1, teams:allTeams, updated:Date.now()});
   if(Store.mode !== 'cloud') return;
+  var at = new Date().toISOString();
   var rows = allTeams.map(function(t, i){
-    return {id:t.id, sort_order:i, data:t, updated_at:new Date().toISOString()};
+    return {id:t.id, sort_order:i, data:t, updated_at:at};
   });
   var res = await sb.from(TABLE).upsert(rows);
   if(res.error) throw new Error(res.error.message);
+  allTeams.forEach(function(t){ Store.lastWrite[t.id] = at; });
 };
 
 Store.deleteTeam = async function(id, allTeams){
