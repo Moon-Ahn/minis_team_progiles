@@ -321,11 +321,6 @@ input.team-name::placeholder{color:var(--ink-3);opacity:.55}
   transition:opacity .2s,transform .2s;
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast button{
-  margin-left:10px;padding:3px 9px;border-radius:6px;cursor:pointer;
-  border:1px solid rgba(255,255,255,.35);background:transparent;color:inherit;font-size:12px;
-  pointer-events:auto;
-}
 
 @media (max-width:860px){
   .layout{display:block}

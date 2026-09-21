@@ -144,18 +144,12 @@ function setStatus(text, cls){
   if(text) statusTimer = setTimeout(function(){ el.textContent=''; el.className='status'; }, 2600);
 }
 var toastTimer = null;
-function toast(msg, actionLabel, onAction){
+function toast(msg){
   var el = document.getElementById('toast');
   el.textContent = msg;
-  if(actionLabel){
-    var b = document.createElement('button');
-    b.textContent = actionLabel;
-    b.addEventListener('click', function(){ el.classList.remove('show'); onAction && onAction(); });
-    el.appendChild(b);
-  }
   el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, actionLabel ? 9000 : 4200);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 4200);
 }
 
 /* ================= 저장 ================= */
@@ -708,15 +702,18 @@ if(window.matchMedia){
         renderRail();
         return;
       }
-      if(at === state.active){
-        toast('다른 분이 이 팀 내용을 수정했습니다.', '최신 내용 보기', function(){
-          state.teams[at] = normalize(Object.assign({}, row.data, {id:row.id}));
-          renderAll();
-        });
-      }else{
-        state.teams[at] = normalize(Object.assign({}, row.data, {id:row.id}));
+      var fresh = normalize(Object.assign({}, row.data, {id:row.id}));
+      if(at !== state.active){
+        state.teams[at] = fresh;
         renderRail();
+        return;
       }
+      // 보고 계신 팀입니다. 칸에 커서가 있으면 적고 계신 중이므로 건드리지 않습니다.
+      // 그 외에는 알림 없이 조용히 최신 내용으로 바꿔 둡니다.
+      var sheets = document.getElementById('sheets');
+      if(document.activeElement && sheets.contains(document.activeElement)) return;
+      state.teams[at] = fresh;
+      renderAll();
     });
   }
 })();
