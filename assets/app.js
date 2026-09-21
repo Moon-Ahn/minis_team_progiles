@@ -6,14 +6,16 @@
 var MAX_PX = 1600;
 var TARGET_KB = 280;
 
+/* 탭 순서는 팀 이름 ㄱㄴㄷ 순입니다 (아래 목록도 같은 순서로 적어 둡니다) */
 var PRESETS = [
-  {id:'mission', name:'선교팀',       light:'#3A6B54', dark:'#7FC0A1', seal:'선교'},
-  {id:'worship', name:'예배팀',       light:'#7A4E63', dark:'#D39DB4', seal:'예배'},
-  {id:'media',   name:'미디어선교팀', light:'#3C5A80', dark:'#96B6DC', seal:'미디어'},
   {id:'prayer',  name:'기도팀',       light:'#5B5486', dark:'#ADA5D8', seal:'기도'},
+  {id:'media',   name:'미디어선교팀', light:'#3C5A80', dark:'#96B6DC', seal:'미디어'},
+  {id:'newfam',  name:'새가족팀',     light:'#2F6E75', dark:'#87C5CB', seal:'새가족'},
+  {id:'mission', name:'선교팀',       light:'#3A6B54', dark:'#7FC0A1', seal:'선교'},
   {id:'nurture', name:'양육팀',       light:'#8A6A34', dark:'#D7B472', seal:'양육'},
-  {id:'newfam',  name:'새가족팀',     light:'#2F6E75', dark:'#87C5CB', seal:'새가족'}
+  {id:'worship', name:'예배팀',       light:'#7A4E63', dark:'#D39DB4', seal:'예배'}
 ];
+var SAMPLE_ID = 'mission';   // 작성 예시를 담아 둘 팀
 var EXTRA_COLORS = [
   {light:'#4A6B3A', dark:'#A5C98E'},
   {light:'#80503C', dark:'#DBA68D'},
@@ -35,7 +37,7 @@ function blank(id, name, colors, seal){
 }
 
 function sampleTeam(){
-  var p = PRESETS[0];
+  var p = PRESETS.filter(function(x){ return x.id === SAMPLE_ID; })[0];
   var t = blank(p.id, p.name, p, p.seal);
   t.sample = true;
   t.leader  = '김하늘 간사 / 부팀장 이도현';
@@ -65,9 +67,21 @@ function sampleTeam(){
 }
 
 function seedTeams(){
-  return PRESETS.map(function(p, i){
-    return i === 0 ? sampleTeam() : blank(p.id, p.name, p, p.seal);
+  return PRESETS.map(function(p){
+    return p.id === SAMPLE_ID ? sampleTeam() : blank(p.id, p.name, p, p.seal);
   });
+}
+
+/* 팀을 이름 ㄱㄴㄷ 순으로 늘어놓습니다. 보고 계시던 팀은 그대로 따라갑니다.
+   순서가 실제로 바뀌었을 때만 true 를 돌려줍니다. */
+function sortTeams(){
+  var keep = state.teams[state.active];
+  var before = state.teams.map(function(t){ return t.id; }).join();
+  state.teams.sort(function(a, b){
+    return String(a.name || '').localeCompare(String(b.name || ''), 'ko');
+  });
+  if(keep) state.active = Math.max(0, state.teams.indexOf(keep));
+  return state.teams.map(function(t){ return t.id; }).join() !== before;
 }
 
 function normalize(t){
@@ -326,6 +340,13 @@ app.addEventListener('input', function(e){
   save();
 });
 
+/* 팀 이름을 다 고치고 나면 ㄱㄴㄷ 자리로 옮깁니다.
+   (타이핑 중에 탭이 움직이면 어지러우므로 입력을 마친 시점에 합니다) */
+app.addEventListener('change', function(e){
+  if(e.target.dataset.f !== 'name') return;
+  if(sortTeams()){ renderAll(); saveOrder(); }
+});
+
 app.addEventListener('click', function(e){
   var b = e.target.closest('button, [data-drop]');
   if(!b) return;
@@ -411,8 +432,10 @@ function addTeam(){
   if(name === null) return;
   name = name.trim() || '새 사역팀';
   var c = EXTRA_COLORS[state.teams.length % EXTRA_COLORS.length];
-  state.teams.push(blank('team-' + Date.now().toString(36), name, c, name.slice(0,3)));
+  var t = blank('team-' + Date.now().toString(36), name, c, name.slice(0,3));
+  state.teams.push(t);
   state.active = state.teams.length - 1;
+  sortTeams();            // 이름 순 제자리에 끼워 넣습니다
   renderAll();
   saveOrder();
 }
@@ -654,8 +677,10 @@ if(window.matchMedia){
     toast('내용을 불러오지 못해 기본 화면으로 시작합니다: ' + (e.message || e));
   }
   state.teams = teams.map(normalize);
+  var reordered = sortTeams();
   renderConn();   // 불러오는 중에 클라우드 연결이 끊겼을 수도 있어 다시 표시합니다
   renderAll();
+  if(reordered) saveOrder();   // 예전 순서로 저장돼 있던 것을 ㄱㄴㄷ 순으로 맞춰 둡니다
 
   // 주소 끝에 ?print=all (또는 ?print=1) 을 붙이면 인쇄본이 미리 만들어진 상태로 열립니다.
   // 바로 Ctrl+P 하시면 되고, PDF 자동 저장에도 이 주소를 씁니다.
