@@ -1,0 +1,8 @@
+.DS_Store
+Thumbs.db
+node_modules/
+.vercel
+*.log
+
+# 인쇄 점검용 샘플 (시험용 사진이 들어 있습니다)
+preview/

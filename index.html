@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>이음청년목장 사역팀 소개서</title>
+<meta name="description" content="이음청년목장 사역팀장들이 직접 팀을 소개하고, A4 한 장으로 인쇄하거나 PDF로 저장하는 페이지입니다.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="이음청년목장 사역팀 소개서">
+<meta property="og:description" content="각 사역팀을 한 장으로 소개합니다.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">이음</div>
+      <div>
+        <h1>사역팀 소개서</h1>
+        <p>Eum Young Adults</p>
+      </div>
+    </div>
+    <div class="actions">
+      <span class="conn" id="conn" data-mode="local"><span class="led"></span><span class="lbl">준비 중</span></span>
+      <button class="btn primary" id="btnPrint" title="이 사역팀 한 장을 인쇄하거나 PDF로 저장합니다 (Ctrl+P)">🖨 <span class="lbl">이 팀 인쇄 · PDF</span></button>
+      <button class="btn" id="btnPrintAll" title="표지와 함께 모든 사역팀을 소책자로 인쇄합니다">📚 <span class="lbl">전체 소책자</span></button>
+      <span class="status" id="status"></span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="rail" id="rail" aria-label="사역팀 선택"></nav>
+    <main class="stage">
+      <div class="stage-inner" id="sheets"></div>
+    </main>
+  </div>
+</div>
+
+<div id="print" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<input type="file" id="filePhoto" accept="image/*" class="sr" tabindex="-1">
+
+<script src="config.js"></script>
+<script src="assets/store.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
